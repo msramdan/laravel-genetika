@@ -114,7 +114,7 @@ class HomeController extends Controller
 
 
         $result = $this->generateSchedule($Kelas, $Hari, $JamAjar, $Guru);
-       
+
 
         foreach ($Guru as &$guru) {
             $guru['teaching'] = 0;
@@ -146,16 +146,19 @@ class HomeController extends Controller
             foreach ($Hari as $hari) {
                 $schedule[$kelas['nama']][$hari['nama']] = [];
                 foreach ($JamAjar as $jamAjar) {
-                    $availableTeachers = array_filter($Guru, function ($guru) use ($schedule, $kelas, $hari) {
-                        $assignedLessons = count(array_filter(array_values($schedule), function ($day) use ($hari, $guru) {
-                            return count(array_filter($day[$hari['nama']], function ($lesson) use ($guru) {
-                                return $lesson['guru'] && $lesson['guru'] === $guru['nama'];
-                            })) > 0;
-                        }));
-                        $dailyLessons = count(array_filter($schedule[$kelas['nama']][$hari['nama']], function ($lesson) use ($guru) {
-                            return $lesson['guru'] === $guru['nama'];
-                        }));
-                        return $assignedLessons < $guru['limit'] && $dailyLessons < $guru['maxInOneday'] && is_array($guru) && isset($guru['nama']);
+                    // Check if any teacher has already reached the limit for the day
+                    $availableTeachers = array_filter($Guru, function ($guru) use ($schedule, $kelas, $hari, $teacherLessonCount) {
+                        $dailyLessons = 0;
+                        foreach ($schedule as $class => $days) {
+                            foreach ($days as $day => $lessons) {
+                                foreach ($lessons as $lesson) {
+                                    if ($lesson['guru'] === $guru['nama'] && $day === $hari['nama']) {
+                                        $dailyLessons++;
+                                    }
+                                }
+                            }
+                        }
+                        return $dailyLessons < $guru['maxInOneday'] && $teacherLessonCount[$guru['nama']] < $guru['limit'] && is_array($guru) && isset($guru['nama']);
                     });
 
                     $teacher = count($availableTeachers) > 0 ? $availableTeachers[array_rand($availableTeachers)] : null;
@@ -163,7 +166,12 @@ class HomeController extends Controller
                         $teacherLessonCount[$teacher['nama']] += 1;
                     }
 
-                    $schedule[$kelas['nama']][$hari['nama']][] = ['jamAjar' => $jamAjar['date'], 'guru' => $teacher ? $teacher['nama'] : null];
+                    $schedule[$kelas['nama']][$hari['nama']][] =
+                        [
+                            'jamAjar' => $jamAjar['date'],
+                            'guru' => $teacher ? $teacher['nama'] : null,
+                            'namaMapel' => $teacher ? $teacher['nama_mapel'] : null,
+                        ];
                 }
             }
         }
