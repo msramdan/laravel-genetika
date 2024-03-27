@@ -110,25 +110,11 @@ class HomeController extends Controller
             $obj['maxInOneday'] = $obj['max_session'];
             return $obj;
         }, $Guru);
-
-
-
+        
         $result = $this->generateSchedule($Kelas, $Hari, $JamAjar, $Guru);
 
-
-        foreach ($Guru as &$guru) {
-            $guru['teaching'] = 0;
-            foreach ($result['schedule'] as $kelas => $hari) {
-                foreach ($hari as $hari => $lessonSet) {
-                    $guru['teaching'] += count(array_filter($lessonSet, function ($lesson) use ($guru) {
-                        return $lesson['guru'] == $guru['nama'];
-                    }));
-                }
-            }
-        }
-
         echo '<pre>;';
-        print_r($result['schedule']);
+        print_r($result);
         echo '</pre>;';
         die();
     }
@@ -136,46 +122,63 @@ class HomeController extends Controller
     function generateSchedule($Kelas, $Hari, $JamAjar, $Guru)
     {
         $schedule = [];
-        $teacherLessonCount = [];
-        foreach ($Guru as $guru) {
-            $teacherLessonCount[$guru['nama']] = 0;
-        }
 
+        // Generate schedule for each class
         foreach ($Kelas as $kelas) {
             $schedule[$kelas['nama']] = [];
+            $teacherLessonCount = []; // Reset the count for each class
+            $teacherAvailability = []; // Track teacher's availability
+
+            // Initialize teacher availability for each day and time slot
+            foreach ($Guru as $guru) {
+                $teacherLessonCount[$guru['nama']] = 0;
+                $teacherAvailability[$guru['nama']] = array_fill_keys(array_column($JamAjar, 'date'), $guru['maxInOneday']);
+            }
+
             foreach ($Hari as $hari) {
                 $schedule[$kelas['nama']][$hari['nama']] = [];
+
                 foreach ($JamAjar as $jamAjar) {
-                    // Check if any teacher has already reached the limit for the day
-                    $availableTeachers = array_filter($Guru, function ($guru) use ($schedule, $kelas, $hari, $teacherLessonCount) {
-                        $dailyLessons = 0;
-                        foreach ($schedule as $class => $days) {
-                            foreach ($days as $day => $lessons) {
-                                foreach ($lessons as $lesson) {
-                                    if ($lesson['guru'] === $guru['nama'] && $day === $hari['nama']) {
-                                        $dailyLessons++;
+                   
+                    $availableTeachersBySlot = [];
+                    foreach ($Guru as $guru) {
+                      
+                        if ($teacherLessonCount[$guru['nama']] < $guru['limit'] && $teacherAvailability[$guru['nama']][$jamAjar['date']] > 0) {
+                            $conflict = false;
+                            foreach ($schedule as $classSchedule) {
+                                if (!empty($classSchedule[$hari['nama']])) {
+                                    foreach ($classSchedule[$hari['nama']] as $lesson) {
+                                        if ($lesson['jamAjar'] === $jamAjar['date'] && $lesson['guru'] === $guru['nama']) {
+                                            $conflict = true;
+                                            break;
+                                        }
                                     }
                                 }
                             }
+                            if (!$conflict) {
+                                $availableTeachersBySlot[] = $guru;
+                            }
                         }
-                        return $dailyLessons < $guru['maxInOneday'] && $teacherLessonCount[$guru['nama']] < $guru['limit'] && is_array($guru) && isset($guru['nama']);
-                    });
-
-                    $teacher = count($availableTeachers) > 0 ? $availableTeachers[array_rand($availableTeachers)] : null;
-                    if ($teacher) {
-                        $teacherLessonCount[$teacher['nama']] += 1;
                     }
 
-                    $schedule[$kelas['nama']][$hari['nama']][] =
-                        [
-                            'jamAjar' => $jamAjar['date'],
-                            'guru' => $teacher ? $teacher['nama'] : null,
-                            'namaMapel' => $teacher ? $teacher['nama_mapel'] : null,
-                        ];
+                    $teacher = count($availableTeachersBySlot) > 0 ? $availableTeachersBySlot[array_rand($availableTeachersBySlot)] : null;
+                    if ($teacher) {
+                        $teacherLessonCount[$teacher['nama']] += 1;
+                        $teacherAvailability[$teacher['nama']][$jamAjar['date']] -= 1;
+                    }
+
+                    $schedule[$kelas['nama']][$hari['nama']][] = [
+                        'jamAjar' => $jamAjar['date'],
+                        'guru' => $teacher ? $teacher['nama'] : null,
+                        'namaMapel' => $teacher ? $teacher['nama_mapel'] : null,
+                    ];
                 }
             }
         }
 
-        return ['schedule' => $schedule, 'teacherLessonCount' => $teacherLessonCount];
+        return $schedule;
     }
+
+
+
 }
