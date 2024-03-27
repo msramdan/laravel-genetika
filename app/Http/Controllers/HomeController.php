@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Jadwal;
 use App\Guru;
+use App\Hari;
+use App\JamAjar;
 use App\Kehadiran;
 use App\Kelas;
 use App\Siswa;
@@ -83,5 +85,89 @@ class HomeController extends Controller
             'user',
             'paket'
         ));
+    }
+
+    public function generate()
+    {
+        $Kelas = (array) Kelas::all()->toArray();
+        $Hari = (array) Hari::all()->toArray();
+        $JamAjar = (array) JamAjar::all()->toArray();
+        $Guru = (array) Guru::join('mapel', 'mapel.id', '=', 'guru.mapel_id')->get()->toArray();
+
+        $Hari = array_map(function ($obj) {
+            $obj['nama'] = $obj['nama_hari'];
+            return $obj;
+        }, $Hari);
+
+        $Kelas = array_map(function ($obj) {
+            $obj['nama'] = $obj['nama_kelas'];
+            return $obj;
+        }, $Kelas);
+
+        $Guru = array_map(function ($obj) {
+            $obj['nama'] = $obj['nama_guru'];
+            $obj['limit'] = $obj['hour_weekly'];
+            $obj['maxInOneday'] = $obj['max_session'];
+            return $obj;
+        }, $Guru);
+
+
+
+        $result = $this->generateSchedule($Kelas, $Hari, $JamAjar, $Guru);
+       
+
+        foreach ($Guru as &$guru) {
+            $guru['teaching'] = 0;
+            foreach ($result['schedule'] as $kelas => $hari) {
+                foreach ($hari as $hari => $lessonSet) {
+                    $guru['teaching'] += count(array_filter($lessonSet, function ($lesson) use ($guru) {
+                        return $lesson['guru'] == $guru['nama'];
+                    }));
+                }
+            }
+        }
+
+        echo '<pre>;';
+        print_r($result['schedule']);
+        echo '</pre>;';
+        die();
+    }
+
+    function generateSchedule($Kelas, $Hari, $JamAjar, $Guru)
+    {
+        $schedule = [];
+        $teacherLessonCount = [];
+        foreach ($Guru as $guru) {
+            $teacherLessonCount[$guru['nama']] = 0;
+        }
+
+        foreach ($Kelas as $kelas) {
+            $schedule[$kelas['nama']] = [];
+            foreach ($Hari as $hari) {
+                $schedule[$kelas['nama']][$hari['nama']] = [];
+                foreach ($JamAjar as $jamAjar) {
+                    $availableTeachers = array_filter($Guru, function ($guru) use ($schedule, $kelas, $hari) {
+                        $assignedLessons = count(array_filter(array_values($schedule), function ($day) use ($hari, $guru) {
+                            return count(array_filter($day[$hari['nama']], function ($lesson) use ($guru) {
+                                return $lesson['guru'] && $lesson['guru'] === $guru['nama'];
+                            })) > 0;
+                        }));
+                        $dailyLessons = count(array_filter($schedule[$kelas['nama']][$hari['nama']], function ($lesson) use ($guru) {
+                            return $lesson['guru'] === $guru['nama'];
+                        }));
+                        return $assignedLessons < $guru['limit'] && $dailyLessons < $guru['maxInOneday'] && is_array($guru) && isset($guru['nama']);
+                    });
+
+                    $teacher = count($availableTeachers) > 0 ? $availableTeachers[array_rand($availableTeachers)] : null;
+                    if ($teacher) {
+                        $teacherLessonCount[$teacher['nama']] += 1;
+                    }
+
+                    $schedule[$kelas['nama']][$hari['nama']][] = ['jamAjar' => $jamAjar['date'], 'guru' => $teacher ? $teacher['nama'] : null];
+                }
+            }
+        }
+
+        return ['schedule' => $schedule, 'teacherLessonCount' => $teacherLessonCount];
     }
 }
