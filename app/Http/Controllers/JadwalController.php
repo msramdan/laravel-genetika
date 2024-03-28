@@ -277,7 +277,6 @@ class JadwalController extends Controller
         $Result = new generateData();
         $Result->data = json_encode($result);
 
-        
         $Result->save();
 
         return redirect()->back()->with('success', 'Jadwal berhasil digenerate!');
@@ -285,15 +284,22 @@ class JadwalController extends Controller
 
     public function generate()
     {
-        $result = generateData::latest()->first() ;
+        $result = generateData::latest()->first();
         $Guru = Guru::get()->toArray();
         $Mapel = Mapel::get()->toArray();
         $Mapel = array_map(function ($obj) {
             $obj['code'] = $this->numberToAlphabet($obj['id']);
             return $obj;
         }, $Mapel);
+        $Hari = Hari::get()->toArray();
+        $JamAjar =  JamAjar::get()->toArray();
+        $Hari = array_map(function ($obj) use ($JamAjar) {
+            $obj['jam_ajar'] = $JamAjar;
+            return $obj;
+        }, $Hari);
 
-        return view('admin.jadwal.generate', ['result' => json_decode($result->data) ?? [], 'gurus' => $Guru, 'mapels' => $Mapel]);
+
+        return view('admin.jadwal.generate', ['result' => json_decode($result->data,true) ?? [], 'gurus' => $Guru, 'mapels' => $Mapel, 'haris' => $Hari]);
     }
 
     function generateSchedule($Kelas, $Hari, $JamAjar, $Guru)
