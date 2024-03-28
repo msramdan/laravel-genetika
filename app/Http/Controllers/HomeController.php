@@ -92,7 +92,7 @@ class HomeController extends Controller
         $Kelas = (array) Kelas::all()->toArray();
         $Hari = (array) Hari::all()->toArray();
         $JamAjar = (array) JamAjar::all()->toArray();
-        $Guru = (array) Guru::join('mapel', 'mapel.id', '=', 'guru.mapel_id')->get()->toArray();
+        $Guru = (array) Guru::select('mapel.*', 'guru.*', 'mapel.id as mapel_id')->join('mapel', 'mapel.id', '=', 'guru.mapel_id')->get()->toArray();
 
         $Hari = array_map(function ($obj) {
             $obj['nama'] = $obj['nama_hari'];
@@ -110,7 +110,7 @@ class HomeController extends Controller
             $obj['maxInOneday'] = $obj['max_session'];
             return $obj;
         }, $Guru);
-        
+
         $result = $this->generateSchedule($Kelas, $Hari, $JamAjar, $Guru);
 
         echo '<pre>;';
@@ -125,7 +125,7 @@ class HomeController extends Controller
 
         foreach ($Kelas as $kelas) {
             $schedule[$kelas['nama']] = [];
-            $teacherLessonCount = []; 
+            $teacherLessonCount = [];
             $teacherAvailability = [];
             foreach ($Guru as $guru) {
                 $teacherLessonCount[$guru['nama']] = 0;
@@ -136,10 +136,10 @@ class HomeController extends Controller
                 $schedule[$kelas['nama']][$hari['nama']] = [];
 
                 foreach ($JamAjar as $jamAjar) {
-                   
+
                     $availableTeachersBySlot = [];
                     foreach ($Guru as $guru) {
-                      
+
                         if ($teacherLessonCount[$guru['nama']] < $guru['limit'] && $teacherAvailability[$guru['nama']][$jamAjar['date']] > 0) {
                             $conflict = false;
                             foreach ($schedule as $classSchedule) {
@@ -168,6 +168,8 @@ class HomeController extends Controller
                         'jamAjar' => $jamAjar['date'],
                         'guru' => $teacher ? $teacher['nama'] : null,
                         'namaMapel' => $teacher ? $teacher['nama_mapel'] : null,
+                        'kelompok' => $teacher ? $teacher['kelompok'] : null,
+                        'code' => $teacher ? $teacher['id'] . $this->numberToAlphabet($teacher['mapel_id']) : null,
                     ];
                 }
             }
@@ -176,6 +178,10 @@ class HomeController extends Controller
         return $schedule;
     }
 
-
-
+    function numberToAlphabet($number)
+    {
+        $alphabet = range('a', 'z');
+        $index = ($number - 1) % 26;
+        return $alphabet[$index];
+    }
 }

@@ -14,9 +14,12 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use PDF;
 use App\Exports\JadwalExport;
+use App\generateData;
 use App\Imports\JadwalImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
+use App\JamAjar;
+use App\Mapel;
 
 class JadwalController extends Controller
 {
@@ -243,5 +246,119 @@ class JadwalController extends Controller
         } else {
             return redirect()->back()->with('warning', 'Data table jadwal kosong!');
         }
+    }
+
+    public function submitGenerate()
+    {
+        $Kelas = (array) Kelas::all()->toArray();
+        $Hari = (array) Hari::all()->toArray();
+        $JamAjar = (array) JamAjar::all()->toArray();
+        $Guru = (array) Guru::select('mapel.*', 'guru.*', 'mapel.id as mapel_id')->join('mapel', 'mapel.id', '=', 'guru.mapel_id')->get()->toArray();
+
+        $Hari = array_map(function ($obj) {
+            $obj['nama'] = $obj['nama_hari'];
+            return $obj;
+        }, $Hari);
+
+        $Kelas = array_map(function ($obj) {
+            $obj['nama'] = $obj['nama_kelas'];
+            return $obj;
+        }, $Kelas);
+
+        $Guru = array_map(function ($obj) {
+            $obj['nama'] = $obj['nama_guru'];
+            $obj['limit'] = $obj['hour_weekly'];
+            $obj['maxInOneday'] = $obj['max_session'];
+            return $obj;
+        }, $Guru);
+
+        $result = $this->generateSchedule($Kelas, $Hari, $JamAjar, $Guru);
+
+        $Result = new generateData();
+        $Result->data = json_encode($result);
+
+        
+        $Result->save();
+
+        return redirect()->back()->with('success', 'Jadwal berhasil digenerate!');
+    }
+
+    public function generate()
+    {
+        $result = generateData::latest()->first() ;
+        $Guru = Guru::get()->toArray();
+        $Mapel = Mapel::get()->toArray();
+        $Mapel = array_map(function ($obj) {
+            $obj['code'] = $this->numberToAlphabet($obj['id']);
+            return $obj;
+        }, $Mapel);
+
+        return view('admin.jadwal.generate', ['result' => json_decode($result->data) ?? [], 'gurus' => $Guru, 'mapels' => $Mapel]);
+    }
+
+    function generateSchedule($Kelas, $Hari, $JamAjar, $Guru)
+    {
+        $schedule = [];
+
+        foreach ($Kelas as $kelas) {
+            $schedule[$kelas['nama']] = [];
+            $teacherLessonCount = [];
+            $teacherAvailability = [];
+            foreach ($Guru as $guru) {
+                $teacherLessonCount[$guru['nama']] = 0;
+                $teacherAvailability[$guru['nama']] = array_fill_keys(array_column($JamAjar, 'date'), $guru['maxInOneday']);
+            }
+
+            foreach ($Hari as $hari) {
+                $schedule[$kelas['nama']][$hari['nama']] = [];
+
+                foreach ($JamAjar as $jamAjar) {
+
+                    $availableTeachersBySlot = [];
+                    foreach ($Guru as $guru) {
+
+                        if ($teacherLessonCount[$guru['nama']] < $guru['limit'] && $teacherAvailability[$guru['nama']][$jamAjar['date']] > 0) {
+                            $conflict = false;
+                            foreach ($schedule as $classSchedule) {
+                                if (!empty($classSchedule[$hari['nama']])) {
+                                    foreach ($classSchedule[$hari['nama']] as $lesson) {
+                                        if ($lesson['jamAjar'] === $jamAjar['date'] && $lesson['guru'] === $guru['nama']) {
+                                            $conflict = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if (!$conflict) {
+                                $availableTeachersBySlot[] = $guru;
+                            }
+                        }
+                    }
+
+                    $teacher = count($availableTeachersBySlot) > 0 ? $availableTeachersBySlot[array_rand($availableTeachersBySlot)] : null;
+                    if ($teacher) {
+                        $teacherLessonCount[$teacher['nama']] += 1;
+                        $teacherAvailability[$teacher['nama']][$jamAjar['date']] -= 1;
+                    }
+
+                    $schedule[$kelas['nama']][$hari['nama']][] = [
+                        'jamAjar' => $jamAjar['date'],
+                        'guru' => $teacher ? $teacher['nama'] : null,
+                        'namaMapel' => $teacher ? $teacher['nama_mapel'] : null,
+                        'kelompok' => $teacher ? $teacher['kelompok'] : null,
+                        'code' => $teacher ? $teacher['id'] . $this->numberToAlphabet($teacher['mapel_id']) : null,
+                    ];
+                }
+            }
+        }
+
+        return $schedule;
+    }
+
+    function numberToAlphabet($number)
+    {
+        $alphabet = range('a', 'z');
+        $index = ($number - 1) % 26;
+        return $alphabet[$index];
     }
 }
