@@ -87,10 +87,21 @@
                                                 $rowspan = 0;
                                             @endphp
                                         @endif
-                                        <td>{{ $jam['date'] }}</td>
 
                                         @foreach ($result as $key => $value)
-                                            <td>{{ $result[$key][$hari['nama_hari']][$indexJam]['code'] }}</td>
+                                            @if ($loop->first)
+                                                <td>{{ $result[$key][$hari['nama_hari']][$indexJam]['jamAjar'] }}</td>
+                                            @endif
+
+                                            @if (
+                                                $result[$key][$hari['nama_hari']][$indexJam]['code'] == 'Apel Pagi' ||
+                                                    $result[$key][$hari['nama_hari']][$indexJam]['code'] == 'Istirahat')
+                                                @if ($loop->first)
+                                                    <td style="text-align: center;background:cyan;color:white" colspan="{{count($result)}}">{{ $result[$key][$hari['nama_hari']][$indexJam]['code'] }}</td>
+                                                @endif
+                                            @else
+                                                <td>{{ $result[$key][$hari['nama_hari']][$indexJam]['code'] }}</td>
+                                            @endif
                                         @endforeach
                                     </tr>
                                 @endforeach

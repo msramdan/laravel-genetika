@@ -298,8 +298,7 @@ class JadwalController extends Controller
             return $obj;
         }, $Hari);
 
-
-        return view('admin.jadwal.generate', ['result' => json_decode($result->data,true) ?? [], 'gurus' => $Guru, 'mapels' => $Mapel, 'haris' => $Hari]);
+        return view('admin.jadwal.generate', ['result' => $this->addStaticData($result->data) ?? [], 'gurus' => $Guru, 'mapels' => $Mapel, 'haris' => $Hari]);
     }
 
     function generateSchedule($Kelas, $Hari, $JamAjar, $Guru)
@@ -366,5 +365,36 @@ class JadwalController extends Controller
         $alphabet = range('a', 'z');
         $index = ($number - 1) % 26;
         return $alphabet[$index];
+    }
+
+    function addStaticData(string $result):array
+    {
+        $data = json_decode($result, true);
+
+        $newElements = [
+            [
+                "jamAjar" => "07:00-08:00",
+                "guru" => "New Guru",
+                "namaMapel" => "New Mapel",
+                "kelompok" => "New Kelompok",
+                "code" => "Apel Pagi"
+            ],
+            [
+                "jamAjar" => "11:00-11:15",
+                "guru" => "New Guru 2",
+                "namaMapel" => "New Mapel 2",
+                "kelompok" => "New Kelompok 2",
+                "code" => "Istirahat"
+            ]
+        ];
+        $data = array_map(function ($obj) use($newElements) {
+            foreach ($obj as $key => &$value) {
+                $value[0] = $newElements[0];
+                $value[4] = $newElements[1];
+            }
+            return $obj;
+        }, $data);
+
+        return $data;
     }
 }
