@@ -123,13 +123,10 @@ class HomeController extends Controller
     {
         $schedule = [];
 
-        // Generate schedule for each class
         foreach ($Kelas as $kelas) {
             $schedule[$kelas['nama']] = [];
-            $teacherLessonCount = []; // Reset the count for each class
-            $teacherAvailability = []; // Track teacher's availability
-
-            // Initialize teacher availability for each day and time slot
+            $teacherLessonCount = []; 
+            $teacherAvailability = [];
             foreach ($Guru as $guru) {
                 $teacherLessonCount[$guru['nama']] = 0;
                 $teacherAvailability[$guru['nama']] = array_fill_keys(array_column($JamAjar, 'date'), $guru['maxInOneday']);
