@@ -12,7 +12,7 @@
 
                 <div class="row mt-4">
                     <div class="col-md-4">
-                        <table class="table table-bordered table-striped table-hover">
+                        <table class="table table-bordered table-striped table-hover" id="example1">
                             <thead>
                                 <tr>
                                     <th>No.</th>
@@ -32,7 +32,7 @@
                         </table>
                     </div>
                     <div class="col-md-4">
-                        <table class="table table-bordered table-striped table-hover">
+                        <table class="table table-bordered table-striped table-hover" id="example3">
                             <thead>
                                 <tr>
                                     <th>No.</th>
@@ -52,6 +52,7 @@
                         </table>
                     </div>
                 </div>
+                <br>
 
                 <div class="col-md-12">
                     <table class="table table-bordered table-striped table-hover">
