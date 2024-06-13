@@ -22,6 +22,8 @@
                     <th>Nama Mapel</th>
                     <th>Paket</th>
                     <th>Kelompok</th>
+                    <th>Hour Weekly</th>
+                    <th>Max Session</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -36,6 +38,8 @@
                       <td>{{ $data->paket->ket }}</td>
                     @endif
                     <td>{{ $data->kelompok }}</td>
+                    <td>{{ $data->hour_weekly }}</td>
+                    <td>{{ $data->max_session }}</td>
                     <td>
                         <form action="{{ route('mapel.destroy', $data->id) }}" method="post">
                             @csrf
@@ -92,6 +96,15 @@
                       <option value="B">Pelajaran Khusus</option>
                       <option value="C">Pelajaran Keahlian</option>
                     </select>
+                </div>
+                <div class="form-group">
+                  <label for="hour_weekly">Hour Weekly</label>
+                  <input type="number" id="hour_weekly" name="hour_weekly" class="form-control @error('hour_weekly') is-invalid @enderror" placeholder="{{ __('Hour Weekly') }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="max_session">Max Session</label>
+                  <input type="number" id="max_session" name="max_session" class="form-control @error('max_session') is-invalid @enderror" placeholder="{{ __('Max Session') }}">
                 </div>
               </div>
             </div>

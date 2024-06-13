@@ -253,6 +253,7 @@ class JadwalController extends Controller
         $Kelas = (array) Kelas::all()->toArray();
         $Hari = (array) Hari::all()->toArray();
         $JamAjar = (array) JamAjar::all()->toArray();
+
         $Guru = (array) Guru::select('mapel.*', 'guru.*', 'mapel.id as mapel_id')->join('mapel', 'mapel.id', '=', 'guru.mapel_id')->get()->toArray();
 
         $Hari = array_map(function ($obj) {
@@ -281,10 +282,11 @@ class JadwalController extends Controller
 
         return redirect()->back()->with('success', 'Jadwal berhasil digenerate!');
     }
-
+    // ramdan
     public function generate()
     {
         $result = generateData::latest()->first();
+
         $Guru = Guru::get()->toArray();
         $Mapel = Mapel::get()->toArray();
         $Mapel = array_map(function ($obj) {
@@ -298,7 +300,12 @@ class JadwalController extends Controller
             return $obj;
         }, $Hari);
 
-        return view('admin.jadwal.generate', ['result' => $this->addStaticData($result->data) ?? [], 'gurus' => $Guru, 'mapels' => $Mapel, 'haris' => $Hari]);
+        return view('admin.jadwal.generate', [
+            'result' => isset($result->data) ? $this->addStaticData($result->data) ?? [] : [],
+            'gurus' => $Guru,
+            'mapels' => $Mapel,
+            'haris' => $Hari
+        ]);
     }
 
     function generateSchedule($Kelas, $Hari, $JamAjar, $Guru)
@@ -309,6 +316,7 @@ class JadwalController extends Controller
             $schedule[$kelas['nama']] = [];
             $teacherLessonCount = [];
             $teacherAvailability = [];
+
             foreach ($Guru as $guru) {
                 $teacherLessonCount[$guru['nama']] = 0;
                 $teacherAvailability[$guru['nama']] = array_fill_keys(array_column($JamAjar, 'date'), $guru['maxInOneday']);
@@ -316,18 +324,16 @@ class JadwalController extends Controller
 
             foreach ($Hari as $hari) {
                 $schedule[$kelas['nama']][$hari['nama']] = [];
-
-                foreach ($JamAjar as $jamAjar) {
-
+                foreach ($JamAjar as $x) {
                     $availableTeachersBySlot = [];
                     foreach ($Guru as $guru) {
 
-                        if ($teacherLessonCount[$guru['nama']] < $guru['limit'] && $teacherAvailability[$guru['nama']][$jamAjar['date']] > 0) {
+                        if ($teacherLessonCount[$guru['nama']] < $guru['limit'] && $teacherAvailability[$guru['nama']][$x['date']] > 0) {
                             $conflict = false;
                             foreach ($schedule as $classSchedule) {
                                 if (!empty($classSchedule[$hari['nama']])) {
                                     foreach ($classSchedule[$hari['nama']] as $lesson) {
-                                        if ($lesson['jamAjar'] === $jamAjar['date'] && $lesson['guru'] === $guru['nama']) {
+                                        if ($lesson['jamAjar'] === $x['date'] && $lesson['guru'] === $guru['nama']) {
                                             $conflict = true;
                                             break;
                                         }
@@ -343,11 +349,11 @@ class JadwalController extends Controller
                     $teacher = count($availableTeachersBySlot) > 0 ? $availableTeachersBySlot[array_rand($availableTeachersBySlot)] : null;
                     if ($teacher) {
                         $teacherLessonCount[$teacher['nama']] += 1;
-                        $teacherAvailability[$teacher['nama']][$jamAjar['date']] -= 1;
+                        $teacherAvailability[$teacher['nama']][$x['date']] -= 1;
                     }
 
                     $schedule[$kelas['nama']][$hari['nama']][] = [
-                        'jamAjar' => $jamAjar['date'],
+                        'jamAjar' => $x['date'],
                         'guru' => $teacher ? $teacher['nama'] : null,
                         'namaMapel' => $teacher ? $teacher['nama_mapel'] : null,
                         'kelompok' => $teacher ? $teacher['kelompok'] : null,
@@ -367,34 +373,56 @@ class JadwalController extends Controller
         return $alphabet[$index];
     }
 
-    function addStaticData(string $result):array
+    function addStaticData(string $result): array
     {
         $data = json_decode($result, true);
 
-        $newElements = [
-            [
-                "jamAjar" => "07:00-08:00",
-                "guru" => "New Guru",
-                "namaMapel" => "New Mapel",
-                "kelompok" => "New Kelompok",
-                "code" => "Apel Pagi"
-            ],
-            [
-                "jamAjar" => "11:00-11:15",
-                "guru" => "New Guru 2",
-                "namaMapel" => "New Mapel 2",
-                "kelompok" => "New Kelompok 2",
-                "code" => "Istirahat"
-            ]
+        $newElementMonday = [
+            "jamAjar" => "07:00-08:00",
+            "guru" => "New Guru",
+            "namaMapel" => "New Mapel",
+            "kelompok" => "New Kelompok",
+            "code" => "Apel Pagi & Upacara Bendera"
         ];
-        $data = array_map(function ($obj) use($newElements) {
-            foreach ($obj as $key => &$value) {
-                $value[0] = $newElements[0];
-                $value[4] = $newElements[1];
-            }
-            return $obj;
-        }, $data);
 
+        $newElementOtherDays = [
+            "jamAjar" => "07:00-07:15",
+            "guru" => "New Guru",
+            "namaMapel" => "New Mapel",
+            "kelompok" => "New Kelompok",
+            "code" => "Apel Pagi"
+        ];
+
+        $newElementBreakMonday = [
+            "jamAjar" => "11:00-11:15",
+            "guru" => "New Guru 2",
+            "namaMapel" => "New Mapel 2",
+            "kelompok" => "New Kelompok 2",
+            "code" => "Istirahat"
+        ];
+
+        $newElementBreak = [
+            "jamAjar" => "10:15-10:30",
+            "guru" => "New Guru 2",
+            "namaMapel" => "New Mapel 2",
+            "kelompok" => "New Kelompok 2",
+            "code" => "Istirahat"
+        ];
+
+        foreach ($data as &$kelas) {
+            foreach ($kelas as $dayName => &$hari) {
+                if ($dayName === 'Senin') {
+                    array_unshift($hari, $newElementMonday);
+                } else {
+                    array_unshift($hari, $newElementOtherDays);
+                }
+                if ($dayName === 'Senin') {
+                    array_splice($hari, 5, 0, [$newElementBreakMonday]);
+                } else {
+                    array_splice($hari, 5, 0, [$newElementBreak]);
+                }
+            }
+        }
         return $data;
     }
 }

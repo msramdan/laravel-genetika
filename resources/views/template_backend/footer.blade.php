@@ -107,6 +107,7 @@
 
     $(function () {
         $("#example1").DataTable();
+        $("#example3").DataTable();
         $('#example2').DataTable({
             "paging": false,
             "lengthChange": false,

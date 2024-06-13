@@ -139,59 +139,6 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex">
-                    <p class="d-flex flex-column">
-                        <span class="text-bold text-lg">Kelas / Paket kelas </span>
-                    </p>
-                    <p class="ml-auto d-flex flex-column text-right">
-                        <span class="text-success">
-                            <i class="fas fa-arrow-up"></i> {{ $kelas }}
-                        </span>
-                    </p>
-                </div>
-                <div class="position-relative mb-4">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="chart-responsive">
-                                <canvas id="pieChartPaket" height="150"></canvas>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <ul class="chart-legend clearfix">
-                                <li><i class="far fa-circle" style="color: #d4c148"></i> X-I</li>
-                                <li><i class="far fa-circle" style="color: #ba6906"></i> X-II</li>
-                                <li><i class="far fa-circle" style="color: #ff990a"></i> X-III</li>
-                                <li><i class="far fa-circle" style="color: #00a352"></i> X-IV</li>
-                                <li><i class="far fa-circle" style="color: #2cabe6"></i> X-V</li>
-                                <li><i class="far fa-circle" style="color: #999999"></i> X-VI</li>
-                                <li><i class="far fa-circle" style="color: #0b2e75"></i> X-VII</li>
-                                <li><i class="far fa-circle" style="color: #003300"></i> X-VIII</li>
-                                <li><i class="far fa-circle" style="color: #003333"></i> XI IIS-I</li>
-                                <li><i class="far fa-circle" style="color: #0033FF"></i> XI IIS-II</li>
-                                <li><i class="far fa-circle" style="color: #0066FF"></i> XI IIS-III</li>
-                                <li><i class="far fa-circle" style="color: #663399"></i> XI MIA-I</li>
-                                <li><i class="far fa-circle" style="color: #990066"></i> XI MIA-II</li>
-                                <li><i class="far fa-circle" style="color: #FF9999"></i> XI MIA-III</li>
-                                <li><i class="far fa-circle" style="color: #FFFF99"></i> XI MIA-IV</li>
-                                <li><i class="far fa-circle" style="color: #66FF66"></i> XI MIA-V</li>
-                                <li><i class="far fa-circle" style="color: #00CCCC"></i> XII IIS-I</li>
-                                <li><i class="far fa-circle" style="color: #00CCFF"></i> XII IIS-II</li>
-                                <li><i class="far fa-circle" style="color: #9999FF"></i> XII IIS-III</li>
-                                <li><i class="far fa-circle" style="color: #FFCCFF"></i> XII MIA-I</li>
-                                <li><i class="far fa-circle" style="color: #99CCFF"></i> XII MIA-II</li>
-                                <li><i class="far fa-circle" style="color: #CCFFFF"></i> XII MIA-III</li>
-                                <li><i class="far fa-circle" style="color: #99FFCC"></i> XII MIA-IV</li>
-                                <li><i class="far fa-circle" style="color: #FFCC99"></i> XII MIA-V</li>                                
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 @section('script')
     <script type="text/javascript">

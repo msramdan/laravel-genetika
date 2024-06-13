@@ -11,7 +11,7 @@
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                @if (Auth::user()->role == 'Admin' || Auth::user()->role == 'Orang Tua')
+                @if (Auth::user()->role == 'Admin' || Auth::user()->role == 'Kepala Sekolah')
                 <li class="nav-item has-treeview" id="liDashboard">
                     <a href="#" class="nav-link" id="Dashboard">
                         <i class="nav-icon fas fa-home"></i>
@@ -44,12 +44,12 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview ml-4">
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a href="{{ route('jadwal.index') }}" class="nav-link" id="DataJadwal">
                                 <i class="fas fa-calendar-alt nav-icon"></i>
                                 <p>Data Jadwal</p>
                             </a>
-                        </li>
+                        </li> --}}
                         <li class="nav-item">
                             <a href="{{ route('jadwal.generate') }}" class="nav-link" id="GenerateJadwal">
                                 <i class="fas fa-calendar-alt nav-icon"></i>
@@ -138,12 +138,12 @@
                 </li>
                 @else
                 @endif
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a href="{{ route('guru.absensi') }}" class="nav-link" id="AbsensiGuru">
                         <i class="fas fa-calendar-check nav-icon"></i>
                         <p>Absensi Guru</p>
                     </a>
-                </li>
+                </li> --}}
                 <li class="nav-item has-treeview" id="liNilai">
                     <a href="#" class="nav-link" id="Nilai">
                         <i class="nav-icon fas fa-file-signature"></i>
@@ -192,12 +192,12 @@
                         <p>Dashboard</p>
                     </a>
                 </li>
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a href="{{ route('absen.harian') }}" class="nav-link" id="AbsenGuru">
                         <i class="fas fa-calendar-check nav-icon"></i>
                         <p>Absen</p>
                     </a>
-                </li>
+                </li> --}}
                 <li class="nav-item">
                     <a href="{{ route('jadwal.guru') }}" class="nav-link" id="JadwalGuru">
                         <i class="fas fa-calendar-alt nav-icon"></i>

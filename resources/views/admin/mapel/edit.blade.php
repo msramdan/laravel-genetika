@@ -62,6 +62,15 @@
                         >Pelajaran Keahlian</option>
                     </select>
                 </div>
+                <div class="form-group">
+                  <label for="hour_weekly">Hour Weekly</label>
+                  <input type="number" id="hour_weekly" name="hour_weekly" value="{{ $mapel->hour_weekly }}" class="form-control @error('hour_weekly') is-invalid @enderror" placeholder="{{ __('Hour Weekly') }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="max_session">Max Session</label>
+                  <input type="number" id="max_session" name="max_session" value="{{ $mapel->max_session }}" class="form-control @error('max_session') is-invalid @enderror" placeholder="{{ __('Max Session') }}">
+                </div>
             </div>
           </div>
         </div>

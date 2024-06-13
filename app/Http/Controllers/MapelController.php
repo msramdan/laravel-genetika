@@ -45,7 +45,9 @@ class MapelController extends Controller
         $this->validate($request, [
             'nama_mapel' => 'required',
             'paket_id' => 'required',
-            'kelompok' => 'required'
+            'kelompok' => 'required',
+            'hour_weekly' => 'required',
+            'max_session' => 'required'
         ]);
 
         Mapel::updateOrCreate(
@@ -56,6 +58,8 @@ class MapelController extends Controller
                 'nama_mapel' => $request->nama_mapel,
                 'paket_id' => $request->paket_id,
                 'kelompok' => $request->kelompok,
+                'hour_weekly' => $request->hour_weekly,
+                'max_session' => $request->max_session,
             ]
         );
 

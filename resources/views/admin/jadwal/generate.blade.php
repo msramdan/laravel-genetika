@@ -77,11 +77,11 @@
                                     $namaHariIndex = $loop->index + 1;
                                 @endphp
 
-                                @foreach ($hari['jam_ajar'] as $indexJam => $jam)
+                                @for ($i = 0; $i <= 9; $i++)
                                     <tr>
                                         @if ($rowspan > 0)
-                                            <td rowspan="{{ $rowspan }}">{{ $namaHariIndex }}</td>
-                                            <td rowspan="{{ $rowspan }}">{{ $hari['nama_hari'] }}</td>
+                                            <td rowspan="10">{{ $namaHariIndex }}</td>
+                                            <td rowspan="10">{{ $hari['nama_hari'] }}</td>
 
                                             @php
                                                 $rowspan = 0;
@@ -90,21 +90,23 @@
 
                                         @foreach ($result as $key => $value)
                                             @if ($loop->first)
-                                                <td>{{ $result[$key][$hari['nama_hari']][$indexJam]['jamAjar'] }}</td>
+                                                <td>{{ $result[$key][$hari['nama_hari']][$i]['jamAjar'] }}</td>
                                             @endif
 
                                             @if (
-                                                $result[$key][$hari['nama_hari']][$indexJam]['code'] == 'Apel Pagi' ||
-                                                    $result[$key][$hari['nama_hari']][$indexJam]['code'] == 'Istirahat')
+                                                $result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi' ||
+                                                    $result[$key][$hari['nama_hari']][$i]['code'] == 'Istirahat' || $result[$key][$hari['nama_hari']][$i]['code'] =='Apel Pagi & Upacara Bendera')
                                                 @if ($loop->first)
-                                                    <td style="text-align: center;background:cyan;color:white" colspan="{{count($result)}}">{{ $result[$key][$hari['nama_hari']][$indexJam]['code'] }}</td>
+                                                    <td style="text-align: center;background:cyan;color:white"
+                                                        colspan="{{ count($result) }}">
+                                                        {{ $result[$key][$hari['nama_hari']][$i]['code'] }}</td>
                                                 @endif
                                             @else
-                                                <td>{{ $result[$key][$hari['nama_hari']][$indexJam]['code'] }}</td>
+                                                <td>{{ $result[$key][$hari['nama_hari']][$i]['code'] }}</td>
                                             @endif
                                         @endforeach
                                     </tr>
-                                @endforeach
+                                @endfor
                             @endforeach
 
                         </tbody>

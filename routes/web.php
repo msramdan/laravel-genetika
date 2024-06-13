@@ -50,10 +50,11 @@ Route::middleware(['auth'])->group(function () {
   Route::post('/pengaturan/ubah-password', 'UserController@ubah_password')->name('pengaturan.ubah-password');
 
   Route::middleware(['siswa'])->group(function () {
-    Route::get('/jadwal/siswa', 'JadwalController@siswa')->name('jadwal.siswa');
+    // Route::get('/jadwal/siswa', 'JadwalController@siswa')->name('jadwal.siswa');
     Route::get('/ulangan/siswa', 'UlanganController@siswa')->name('ulangan.siswa');
     Route::get('/sikap/siswa', 'SikapController@siswa')->name('sikap.siswa');
     Route::get('/rapot/siswa', 'RapotController@siswa')->name('rapot.siswa');
+    Route::get('/jadwal/siswa', 'JadwalController@generate')->name('jadwal.siswa');
   });
 
   Route::middleware(['guru'])->group(function () {
@@ -65,6 +66,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/sikap', 'SikapController');
     Route::get('/rapot/predikat', 'RapotController@predikat');
     Route::resource('/rapot', 'RapotController');
+    Route::get('/jadwal/guru', 'JadwalController@generate')->name('jadwal.guru');
   });
 
   Route::middleware(['admin'])->group(function () {
