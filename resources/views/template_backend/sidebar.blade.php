@@ -171,12 +171,12 @@
                                 <p>Nilai Rapot</p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a href="{{ route('predikat') }}" class="nav-link" id="Deskripsi">
                                 <i class="fas fa-file-alt nav-icon"></i>
                                 <p>Deskripsi Predikat</p>
                             </a>
-                        </li>
+                        </li> --}}
                     </ul>
                 </li>
                 <li class="nav-item">
@@ -237,12 +237,12 @@
                                 <p>Entry Nilai Rapot</p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a href="{{ route('nilai.index') }}" class="nav-link" id="DesGuru">
                                 <i class="fas fa-file-alt nav-icon"></i>
                                 <p>Deskripsi Predikat</p>
                             </a>
-                        </li>
+                        </li> --}}
                     </ul>
                 </li>
                 @elseif (Auth::user()->role == 'Siswa' && Auth::user()->siswa(Auth::user()->no_induk))

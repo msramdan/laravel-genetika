@@ -8,7 +8,9 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <button id="generate" class="btn btn-primary">Generate Jadwal</button>
+                @if (Auth::user()->role == 'Admin')
+                    <button id="generate" class="btn btn-primary">Generate Jadwal</button>
+                @endif
 
                 <div class="row mt-4">
                     <div class="col-md-4">
@@ -96,7 +98,8 @@
 
                                             @if (
                                                 $result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi' ||
-                                                    $result[$key][$hari['nama_hari']][$i]['code'] == 'Istirahat' || $result[$key][$hari['nama_hari']][$i]['code'] =='Apel Pagi & Upacara Bendera')
+                                                    $result[$key][$hari['nama_hari']][$i]['code'] == 'Istirahat' ||
+                                                    $result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi & Upacara Bendera')
                                                 @if ($loop->first)
                                                     <td style="text-align: center;background:cyan;color:white"
                                                         colspan="{{ count($result) }}">

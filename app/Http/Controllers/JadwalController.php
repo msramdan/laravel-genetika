@@ -20,6 +20,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
 use App\JamAjar;
 use App\Mapel;
+use Illuminate\Support\Facades\DB;
 
 class JadwalController extends Controller
 {
@@ -273,8 +274,10 @@ class JadwalController extends Controller
             return $obj;
         }, $Guru);
 
+        // delete table jadwal
+        DB::table('jadwal')->truncate();
+        DB::table('generator_data')->truncate();
         $result = $this->generateSchedule($Kelas, $Hari, $JamAjar, $Guru);
-
         $Result = new generateData();
         $Result->data = json_encode($result);
 
@@ -311,7 +314,6 @@ class JadwalController extends Controller
     function generateSchedule($Kelas, $Hari, $JamAjar, $Guru)
     {
         $schedule = [];
-
         foreach ($Kelas as $kelas) {
             $schedule[$kelas['nama']] = [];
             $teacherLessonCount = [];
@@ -351,6 +353,17 @@ class JadwalController extends Controller
                         $teacherLessonCount[$teacher['nama']] += 1;
                         $teacherAvailability[$teacher['nama']][$x['date']] -= 1;
                     }
+                    $waktu_terpisah = explode('-',  $x['date']);
+                    $jam_mulai = $waktu_terpisah[0];
+                    $jam_selesai = $waktu_terpisah[1];
+                    DB::table('jadwal')->insert([
+                        'hari_id' => $hari['id'],
+                        'kelas_id' =>  $kelas['id'],
+                        'mapel_id' => $teacher['mapel_id'],
+                        'guru_id' => $teacher['id'],
+                        'jam_mulai' => $jam_mulai,
+                        'jam_selesai' => $jam_selesai,
+                    ]);
 
                     $schedule[$kelas['nama']][$hari['nama']][] = [
                         'jamAjar' => $x['date'],
@@ -378,7 +391,7 @@ class JadwalController extends Controller
         $data = json_decode($result, true);
 
         $newElementMonday = [
-            "jamAjar" => "07:00-08:00",
+            "jamAjar" => "08:00-08:45",  // Mengubah jam ajar menjadi 08:00-08:45
             "guru" => "New Guru",
             "namaMapel" => "New Mapel",
             "kelompok" => "New Kelompok",
@@ -412,6 +425,15 @@ class JadwalController extends Controller
         foreach ($data as &$kelas) {
             foreach ($kelas as $dayName => &$hari) {
                 if ($dayName === 'Senin') {
+                    $hari[0]['jamAjar'] = "08:00-08:45";
+                    $hari[1]['jamAjar'] = "08:45-09:30";
+                    $hari[2]['jamAjar'] = "09:30-10:15";
+                    $hari[3]['jamAjar'] = "10:15-11:00";
+                    $hari[4]['jamAjar'] = "11:15-12:00";
+                    $hari[5]['jamAjar'] = "12:00-12:45";
+                    $hari[6]['jamAjar'] = "12:45-13:30";
+                    $hari[7]['jamAjar'] = "13:30-14:10";
+
                     array_unshift($hari, $newElementMonday);
                 } else {
                     array_unshift($hari, $newElementOtherDays);
