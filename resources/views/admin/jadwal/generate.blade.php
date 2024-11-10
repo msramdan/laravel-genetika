@@ -81,43 +81,44 @@
                                 @endphp
                         
                                 @for ($i = 0; $i <= 9; $i++)
-                                    @if (isset($result[$key][$hari['nama_hari']][$i])) <!-- Hanya tampilkan baris jika ada data -->
-                                        <tr>
-                                            @if ($rowspan > 0)
-                                                <td rowspan="10">{{ $namaHariIndex }}</td>
-                                                <td rowspan="10">{{ $hari['nama_hari'] }}</td>
+                                    <tr>
+                                        @if ($rowspan > 0)
+                                            <td rowspan="10">{{ $namaHariIndex }}</td>
+                                            <td rowspan="10">{{ $hari['nama_hari'] }}</td>
                         
-                                                @php
-                                                    $rowspan = 0;
-                                                @endphp
+                                            @php
+                                                $rowspan = 0;
+                                            @endphp
+                                        @endif
+                        
+                                        @foreach ($result as $key => $value)
+                                            @if ($loop->first)
+                                                @if (isset($result[$key][$hari['nama_hari']][$i]['jamAjar']))
+                                                    <td>{{ $result[$key][$hari['nama_hari']][$i]['jamAjar'] }}</td>
+                                                @else
+                                                    <td>-</td> <!-- Atur nilai default jika data tidak tersedia -->
+                                                @endif
                                             @endif
                         
-                                            @foreach ($result as $key => $value)
-                                                @if ($loop->first && isset($result[$key][$hari['nama_hari']][$i]['jamAjar']))
-                                                    <td>{{ $result[$key][$hari['nama_hari']][$i]['jamAjar'] }}</td>
+                                            @if (
+                                                isset($result[$key][$hari['nama_hari']][$i]['code']) &&
+                                                ($result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi' ||
+                                                $result[$key][$hari['nama_hari']][$i]['code'] == 'Istirahat' ||
+                                                $result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi dan Kultum' ||
+                                                $result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi & Upacara Bendera'))
+                                                @if ($loop->first)
+                                                    <td style="text-align: center;background:cyan;color:white" colspan="{{ count($result) }}">
+                                                        {{ $result[$key][$hari['nama_hari']][$i]['code'] }}
+                                                    </td>
                                                 @endif
-                        
-                                                @if (
-                                                    isset($result[$key][$hari['nama_hari']][$i]['code']) &&
-                                                    ($result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi' ||
-                                                    $result[$key][$hari['nama_hari']][$i]['code'] == 'Istirahat' ||
-                                                    $result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi dan Kultum' || 
-                                                    $result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi & Upacara Bendera'))
-                                                    @if ($loop->first)
-                                                        <td style="text-align: center;background:cyan;color:white" colspan="{{ count($result) }}">
-                                                            {{ $result[$key][$hari['nama_hari']][$i]['code'] }}
-                                                        </td>
-                                                    @endif
-                                                @elseif (isset($result[$key][$hari['nama_hari']][$i]['code']))
-                                                    <td>{{ $result[$key][$hari['nama_hari']][$i]['code'] }}</td>
-                                                @endif
-                                            @endforeach
-                                        </tr>
-                                    @endif
+                                            @else
+                                                <td>{{ $result[$key][$hari['nama_hari']][$i]['code'] ?? '-' }}</td> <!-- Nilai default jika data tidak tersedia -->
+                                            @endif
+                                        @endforeach
+                                    </tr>
                                 @endfor
                             @endforeach
                         </tbody>
-                        
                         
                     </table>
 

@@ -453,7 +453,6 @@ class JadwalController extends Controller
                     });
                     $hari = array_values($hari);
                 }
-    
                 // Penyesuaian jadwal untuk Senin
                 if ($dayName === 'Senin') {
                     $hari[0]['jamAjar'] = "08:00-08:45";
@@ -481,8 +480,7 @@ class JadwalController extends Controller
                 }
             }
         }
-    
-        dd($data);
+        // dd($data);
         return $data;
     }
     
