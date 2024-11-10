@@ -389,15 +389,15 @@ class JadwalController extends Controller
     function addStaticData(string $result): array
     {
         $data = json_decode($result, true);
-
+    
         $newElementMonday = [
-            "jamAjar" => "08:00-08:45",  // Mengubah jam ajar menjadi 08:00-08:45
+            "jamAjar" => "07:00-08:00",
             "guru" => "New Guru",
             "namaMapel" => "New Mapel",
             "kelompok" => "New Kelompok",
             "code" => "Apel Pagi & Upacara Bendera"
         ];
-
+    
         $newElementOtherDays = [
             "jamAjar" => "07:00-07:15",
             "guru" => "New Guru",
@@ -405,7 +405,15 @@ class JadwalController extends Controller
             "kelompok" => "New Kelompok",
             "code" => "Apel Pagi"
         ];
-
+    
+        $newElementFriday = [
+            "jamAjar" => "07:00-07:20",
+            "guru" => "New Guru",
+            "namaMapel" => "New Mapel",
+            "kelompok" => "New Kelompok",
+            "code" => "Apel Pagi dan Kultum"
+        ];
+    
         $newElementBreakMonday = [
             "jamAjar" => "11:00-11:15",
             "guru" => "New Guru 2",
@@ -413,7 +421,7 @@ class JadwalController extends Controller
             "kelompok" => "New Kelompok 2",
             "code" => "Istirahat"
         ];
-
+    
         $newElementBreak = [
             "jamAjar" => "10:15-10:30",
             "guru" => "New Guru 2",
@@ -421,9 +429,32 @@ class JadwalController extends Controller
             "kelompok" => "New Kelompok 2",
             "code" => "Istirahat"
         ];
-
+    
+        $newElementBreakFriday = [
+            "jamAjar" => "08:50-09:10",
+            "guru" => "New Guru 2",
+            "namaMapel" => "New Mapel 2",
+            "kelompok" => "New Kelompok 2",
+            "code" => "Istirahat"
+        ];
+    
         foreach ($data as &$kelas) {
             foreach ($kelas as $dayName => &$hari) {
+                // Menghapus data jam pada hari Sabtu untuk waktu tertentu
+                if ($dayName === 'Sabtu') {
+                    $hari = array_filter($hari, function ($item) {
+                        return $item['jamAjar'] !== '12:00-12:45' && $item['jamAjar'] !== '12:45-13:30';
+                    });
+                    $hari = array_values($hari);
+                }
+                if ($dayName === "Jum'at") {
+                    $hari = array_filter($hari, function ($item) {
+                        return $item['jamAjar'] !== '11:15-12:00' && $item['jamAjar'] !== '12:00-12:45' && $item['jamAjar'] !== '12:45-13:30';
+                    });
+                    $hari = array_values($hari);
+                }
+    
+                // Penyesuaian jadwal untuk Senin
                 if ($dayName === 'Senin') {
                     $hari[0]['jamAjar'] = "08:00-08:45";
                     $hari[1]['jamAjar'] = "08:45-09:30";
@@ -433,18 +464,26 @@ class JadwalController extends Controller
                     $hari[5]['jamAjar'] = "12:00-12:45";
                     $hari[6]['jamAjar'] = "12:45-13:30";
                     $hari[7]['jamAjar'] = "13:30-14:10";
-
                     array_unshift($hari, $newElementMonday);
+                } else if ($dayName === "Jum'at") {
+                    array_unshift($hari, $newElementFriday);
                 } else {
                     array_unshift($hari, $newElementOtherDays);
                 }
+    
+                // Menambahkan elemen istirahat untuk setiap hari
                 if ($dayName === 'Senin') {
                     array_splice($hari, 5, 0, [$newElementBreakMonday]);
+                } else if ($dayName === "Jum'at") {
+                    array_splice($hari, 3, 0, [$newElementBreakFriday]);
                 } else {
                     array_splice($hari, 5, 0, [$newElementBreak]);
                 }
             }
         }
+    
+        dd($data);
         return $data;
     }
+    
 }
