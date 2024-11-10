@@ -465,6 +465,17 @@ class JadwalController extends Controller
                     $hari[7]['jamAjar'] = "13:30-14:10";
                     array_unshift($hari, $newElementMonday);
                 } else if ($dayName === "Jum'at") {
+                    $hari[0]['jamAjar'] = "07:20-08:05";
+                    $hari[1]['jamAjar'] = "08:05-08:50";
+                    $hari[2]['jamAjar'] = "09:10-09:55";
+                    $hari[3]['jamAjar'] = "09:55-11:00";
+                    if ($dayName === "Jum'at") {
+                        $hari = array_filter($hari, function ($item) {
+                            return $item['jamAjar'] !== '10:30-11:15';
+                        });
+                        $hari = array_values($hari);
+                    }
+
                     array_unshift($hari, $newElementFriday);
                 } else {
                     array_unshift($hari, $newElementOtherDays);

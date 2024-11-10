@@ -80,12 +80,11 @@
                                     $namaHariIndex = $loop->index + 1;
                                 @endphp
                         
-                                @for ($i = 0; $i <= 9; $i++)
+                                @for ($i = 0; $i < count($hari['jam_ajar']); $i++) <!-- Sesuaikan dengan jumlah data -->
                                     <tr>
                                         @if ($rowspan > 0)
-                                            <td rowspan="10">{{ $namaHariIndex }}</td>
-                                            <td rowspan="10">{{ $hari['nama_hari'] }}</td>
-                        
+                                            <td rowspan="{{ count($hari['jam_ajar']) }}">{{ $namaHariIndex }}</td>
+                                            <td rowspan="{{ count($hari['jam_ajar']) }}">{{ $hari['nama_hari'] }}</td>
                                             @php
                                                 $rowspan = 0;
                                             @endphp
@@ -100,12 +99,8 @@
                                                 @endif
                                             @endif
                         
-                                            @if (
-                                                isset($result[$key][$hari['nama_hari']][$i]['code']) &&
-                                                ($result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi' ||
-                                                $result[$key][$hari['nama_hari']][$i]['code'] == 'Istirahat' ||
-                                                $result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi dan Kultum' ||
-                                                $result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi & Upacara Bendera'))
+                                            @if (isset($result[$key][$hari['nama_hari']][$i]['code']) && 
+                                                in_array($result[$key][$hari['nama_hari']][$i]['code'], ['Apel Pagi', 'Istirahat', 'Apel Pagi dan Kultum', 'Apel Pagi & Upacara Bendera']))
                                                 @if ($loop->first)
                                                     <td style="text-align: center;background:cyan;color:white" colspan="{{ count($result) }}">
                                                         {{ $result[$key][$hari['nama_hari']][$i]['code'] }}
@@ -119,6 +114,7 @@
                                 @endfor
                             @endforeach
                         </tbody>
+                        
                         
                     </table>
 
