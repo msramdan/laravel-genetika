@@ -93,7 +93,7 @@
                         <p class="text-muted">{{ Auth::user()->guru(Auth::user()->id_card)->kode }}</p>
                         <hr>
                     @elseif (Auth::user()->role == 'Siswa')
-                        <strong><i class="fas fa-home mr-1"></i> Tempat Lahir</strong>
+                        <strong><i class="fas fa-home mr-1"></i>Kelas Kamu</strong>
                         <p class="text-muted">{{ Auth::user()->siswa(Auth::user()->no_induk)->kelas->nama_kelas }}</p>
                         <hr>
                     @else

@@ -37,9 +37,9 @@
                             <button type="button" class="btn btn-info btn-sm" onclick="getSubsSiswa({{$data->id}})" data-toggle="modal" data-target=".view-siswa">
                               <i class="nav-icon fas fa-users"></i> &nbsp; View Siswa
                             </button>
-                            <button type="button" class="btn btn-info btn-sm" onclick="getSubsJadwal({{$data->id}})" data-toggle="modal" data-target=".view-jadwal">
+                            <!-- <button type="button" class="btn btn-info btn-sm" onclick="getSubsJadwal({{$data->id}})" data-toggle="modal" data-target=".view-jadwal">
                               <i class="nav-icon fas fa-calendar-alt"></i> &nbsp; View Jadwal
-                            </button>
+                            </button> -->
                             <button type="button" class="btn btn-success btn-sm" onclick="getEditKelas({{$data->id}})" data-toggle="modal" data-target="#form-kelas">
                               <i class="nav-icon fas fa-edit"></i> &nbsp; Edit
                             </button>
@@ -227,7 +227,7 @@
             // console.log(result);
           if(result){
             $.each(result,function(index, val){
-              $("#judul").text('Edit Data Kelas ' + val.nama);
+              $("#judul").text('Edit view jadwal ' + val.nama);
               $('#id').val(val.id);
               $('#form_nama').html('');
               $('#form_paket').html('');

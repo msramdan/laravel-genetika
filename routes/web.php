@@ -124,6 +124,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/jadwal/deleteAll', 'JadwalController@deleteAll')->name('jadwal.deleteAll');
     Route::get('/jadwal/generate', 'JadwalController@generate')->name('jadwal.generate');
     Route::post('/jadwal/generate', 'JadwalController@submitGenerate')->name('jadwal.submitGenerate');
+    Route::get('/jadwal/cetak-pdf', 'JadwalController@cetakPDF')->name('jadwal.cetak-pdf');
     Route::resource('/jadwal', 'JadwalController');
 
     Route::get('/ulangan-kelas', 'UlanganController@create')->name('ulangan-kelas');

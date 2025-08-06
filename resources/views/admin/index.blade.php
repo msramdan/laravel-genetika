@@ -5,7 +5,7 @@
   <li class="breadcrumb-item active">Dashboard</li>
 @endsection
 @section('content')
-    <div class="col-lg-4 col-6">
+    <!-- <div class="col-lg-4 col-6">
         <div class="small-box bg-info">
             <div class="inner">
                 <h3>{{ $jadwal }}</h3>
@@ -16,7 +16,7 @@
             </div>
             <a href="{{ route('jadwal.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
-    </div>
+    </div> -->
     <div class="col-lg-4 col-6">
         <div class="small-box bg-warning">
             <div class="inner" style="color: #FFFFFF;">

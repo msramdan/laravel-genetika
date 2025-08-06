@@ -120,27 +120,31 @@
                       <input type="text" id="nis" name="nis" onkeypress="return inputAngka(event)" value="{{ Auth::user()->siswa(Auth::user()->no_induk)->nis }}" class="form-control @error('nis') is-invalid @enderror">
                   </div>
                   <div class="form-group">
-                      <label for="kelas_id">Kelas</label>
-                      <select id="kelas_id" name="kelas_id" class="select2bs4 form-control @error('kelas_id') is-invalid @enderror">
-                          <option value="">-- Pilih Kelas --</option>
-                          @foreach ($kelas as $data)
-                              <option value="{{ $data->id }}"
-                                  @if (Auth::user()->siswa(Auth::user()->no_induk)->kelas_id == $data->id)
-                                      selected
-                                  @endif
-                              >{{ $data->nama_kelas }}</option>
-                          @endforeach
-                      </select>
-                  </div>
-                  <div class="form-group">
-                      <label for="telp">Nomor Telpon/HP</label>
-                      <input type="text" id="telp" name="telp" value="{{ Auth::user()->siswa(Auth::user()->no_induk)->telp }}" onkeypress="return inputAngka(event)" class="form-control @error('telp') is-invalid @enderror">
-                  </div>
-                  <div class="form-group">
-                      <label for="tgl_lahir">Tanggal Lahir</label>
-                      <input type="date" id="tgl_lahir" name="tgl_lahir" value="{{ Auth::user()->siswa(Auth::user()->no_induk)->tgl_lahir }}" class="form-control @error('tgl_lahir') is-invalid @enderror">
-                  </div>
-              </div>
+                    <label for="kelas_id">Kelas</label>
+                    @if(Auth::user()->is_admin) <!-- Hanya admin yang bisa melihat dropdown untuk mengedit kelas -->
+                        <select id="kelas_id" name="kelas_id" class="select2bs4 form-control @error('kelas_id') is-invalid @enderror">
+                            <option value="">-- Pilih Kelas --</option>
+                            @foreach ($kelas as $data)
+                                <option value="{{ $data->id }}"
+                                    @if (Auth::user()->siswa(Auth::user()->no_induk)->kelas_id == $data->id)
+                                        selected
+                                    @endif
+                                >{{ $data->nama_kelas }}</option>
+                            @endforeach
+                        </select>
+                    @else <!-- Untuk non-admin, tampilkan kelas sebagai teks dan masukkan kelas_id dalam hidden input -->
+                        <input type="text" class="form-control" value="{{ Auth::user()->siswa(Auth::user()->no_induk)->kelas->nama_kelas }}" readonly>
+                        <input type="hidden" name="kelas_id" value="{{ Auth::user()->siswa(Auth::user()->no_induk)->kelas_id }}">
+                    @endif
+                </div>
+                <div class="form-group">
+                    <label for="telp">Nomor Telpon/HP</label>
+                    <input type="text" id="telp" name="telp" value="{{ Auth::user()->siswa(Auth::user()->no_induk)->telp }}" onkeypress="return inputAngka(event)" class="form-control @error('telp') is-invalid @enderror">
+                </div>
+                <div class="form-group">
+                    <label for="tgl_lahir">Tanggal Lahir</label>
+                    <input type="date" id="tgl_lahir" name="tgl_lahir" value="{{ Auth::user()->siswa(Auth::user()->no_induk)->tgl_lahir }}" class="form-control @error('tgl_lahir') is-invalid @enderror">
+                </div>
             </div>
           @else
             <div class="row">

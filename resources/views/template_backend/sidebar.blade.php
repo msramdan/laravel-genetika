@@ -98,12 +98,12 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview ml-4">
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a href="{{ route('jadwal.trash') }}" class="nav-link" id="TrashJadwal">
                                 <i class="fas fa-calendar-alt nav-icon"></i>
                                 <p>Trash Jadwal</p>
                             </a>
-                        </li>
+                        </li> -->
                         <li class="nav-item">
                             <a href="{{ route('guru.trash') }}" class="nav-link" id="TrashGuru">
                                 <i class="fas fa-users nav-icon"></i>
@@ -144,7 +144,7 @@
                         <p>Absensi Guru</p>
                     </a>
                 </li> --}}
-                <li class="nav-item has-treeview" id="liNilai">
+                <!-- <li class="nav-item has-treeview" id="liNilai">
                     <a href="#" class="nav-link" id="Nilai">
                         <i class="nav-icon fas fa-file-signature"></i>
                         <p>
@@ -178,7 +178,7 @@
                             </a>
                         </li> --}}
                     </ul>
-                </li>
+                </li> -->
                 <li class="nav-item">
                     <a href="{{ route('admin.pengumuman') }}" class="nav-link" id="Pengumuman">
                         <i class="nav-icon fas fa-clipboard"></i>
@@ -204,7 +204,7 @@
                         <p>Jadwal</p>
                     </a>
                 </li>
-                <li class="nav-item has-treeview" id="liNilaiGuru">
+                <!-- <li class="nav-item has-treeview" id="liNilaiGuru">
                     <a href="#" class="nav-link" id="NilaiGuru">
                         <i class="nav-icon fas fa-file-signature"></i>
                         <p>
@@ -244,7 +244,7 @@
                             </a>
                         </li> --}}
                     </ul>
-                </li>
+                </li> -->
                 @elseif (Auth::user()->role == 'Siswa' && Auth::user()->siswa(Auth::user()->no_induk))
                 <li class="nav-item has-treeview">
                     <a href="{{ url('/') }}" class="nav-link" id="Home">
@@ -258,7 +258,7 @@
                         <p>Jadwal</p>
                     </a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a href="{{ route('ulangan.siswa') }}" class="nav-link" id="UlanganSiswa">
                         <i class="fas fa-file-alt nav-icon"></i>
                         <p>Ulangan</p>
@@ -275,7 +275,7 @@
                         <i class="fas fa-file-alt nav-icon"></i>
                         <p>Rapot</p>
                     </a>
-                </li>
+                </li> -->
                 @else
                 <li class="nav-item has-treeview">
                     <a href="{{ url('/') }}" class="nav-link" id="Home">

@@ -11,6 +11,7 @@
                 @if (Auth::user()->role == 'Admin')
                     <button id="generate" class="btn btn-primary">Generate Jadwal</button>
                 @endif
+                <a href="{{ route('jadwal.cetak-pdf') }}" class="btn btn-success">Cetak PDF</a>
 
                 <div class="row mt-4">
                     <div class="col-md-4">
@@ -72,25 +73,25 @@
                             @php
                                 $prevNamaHari = '';
                             @endphp
-                        
+
                             @foreach ($haris as $hari)
                                 @php
                                     $rowspan = $hari['nama_hari'] !== $prevNamaHari ? count($hari['jam_ajar']) : 0;
                                     $prevNamaHari = $hari['nama_hari'];
                                     $namaHariIndex = $loop->index + 1;
                                 @endphp
-                        
+
                                 @for ($i = 0; $i <= 9; $i++)
                                     <tr>
                                         @if ($rowspan > 0)
                                             <td rowspan="10">{{ $namaHariIndex }}</td>
                                             <td rowspan="10">{{ $hari['nama_hari'] }}</td>
-                        
+
                                             @php
                                                 $rowspan = 0;
                                             @endphp
                                         @endif
-                        
+
                                         @foreach ($result as $key => $value)
                                             @if ($loop->first)
                                                 @if (isset($result[$key][$hari['nama_hari']][$i]['jamAjar']))
@@ -99,27 +100,28 @@
                                                     <td>-</td> <!-- Atur nilai default jika data tidak tersedia -->
                                                 @endif
                                             @endif
-                        
-                                            @if (
-                                                isset($result[$key][$hari['nama_hari']][$i]['code']) &&
-                                                ($result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi' ||
-                                                $result[$key][$hari['nama_hari']][$i]['code'] == 'Istirahat' ||
-                                                $result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi dan Kultum' ||
-                                                $result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi & Upacara Bendera'))
+
+                                            @if (isset($result[$key][$hari['nama_hari']][$i]['code']) &&
+                                                    ($result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi' ||
+                                                        $result[$key][$hari['nama_hari']][$i]['code'] == 'Istirahat' ||
+                                                        $result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi dan Kultum' ||
+                                                        $result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi & Upacara Bendera'))
                                                 @if ($loop->first)
-                                                    <td style="text-align: center;background:cyan;color:white" colspan="{{ count($result) }}">
+                                                    <td style="text-align: center;background:cyan;color:white"
+                                                        colspan="{{ count($result) }}">
                                                         {{ $result[$key][$hari['nama_hari']][$i]['code'] }}
                                                     </td>
                                                 @endif
                                             @else
-                                                <td>{{ $result[$key][$hari['nama_hari']][$i]['code'] ?? '-' }}</td> <!-- Nilai default jika data tidak tersedia -->
+                                                <td>{{ $result[$key][$hari['nama_hari']][$i]['code'] ?? '-' }}</td>
+                                                <!-- Nilai default jika data tidak tersedia -->
                                             @endif
                                         @endforeach
                                     </tr>
                                 @endfor
                             @endforeach
                         </tbody>
-                        
+
                     </table>
 
                 </div>

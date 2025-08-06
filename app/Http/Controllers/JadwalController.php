@@ -12,7 +12,7 @@ use App\Ruang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
-use PDF;
+// use PDF;
 use App\Exports\JadwalExport;
 use App\generateData;
 use App\Imports\JadwalImport;
@@ -21,6 +21,7 @@ use App\Http\Controllers\Controller;
 use App\JamAjar;
 use App\Mapel;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class JadwalController extends Controller
 {
@@ -196,13 +197,38 @@ class JadwalController extends Controller
         return response()->json($newForm);
     }
 
-    public function cetak_pdf(Request $request)
+    // public function cetak_pdf(Request $request)
+    // {
+    //     $jadwal = Jadwal::OrderBy('hari_id', 'asc')->OrderBy('jam_mulai', 'asc')->where('kelas_id', $request->id)->get();
+    //     $kelas = Kelas::findorfail($request->id);
+    //     $pdf = PDF::loadView('jadwal-pdf', ['jadwal' => $jadwal, 'kelas' => $kelas]);
+    //     return $pdf->stream();
+    // }
+    public function cetakPDF()
     {
-        $jadwal = Jadwal::OrderBy('hari_id', 'asc')->OrderBy('jam_mulai', 'asc')->where('kelas_id', $request->id)->get();
-        $kelas = Kelas::findorfail($request->id);
-        $pdf = PDF::loadView('jadwal-pdf', ['jadwal' => $jadwal, 'kelas' => $kelas]);
-        return $pdf->stream();
-        // return $pdf->stream('jadwal-pdf.pdf');
+        $result = generateData::latest()->first();
+        $Guru = Guru::get()->toArray();
+        $Mapel = Mapel::get()->toArray();
+        $Mapel = array_map(function ($obj) {
+            $obj['code'] = $this->numberToAlphabet($obj['id']);
+            return $obj;
+        }, $Mapel);
+        $Hari = Hari::get()->toArray();
+        $JamAjar = JamAjar::get()->toArray();
+        $Hari = array_map(function ($obj) use ($JamAjar) {
+            $obj['jam_ajar'] = $JamAjar;
+            return $obj;
+        }, $Hari);
+
+        $data = [
+            'result' => isset($result->data) ? $this->addStaticData($result->data) ?? [] : [],
+            'gurus' => $Guru,
+            'mapels' => $Mapel,
+            'haris' => $Hari
+        ];
+
+        $pdf = PDF::loadView('admin.jadwal.cetak-pdf', $data);
+        return $pdf->setPaper('a4', 'landscape')->stream('jadwal.pdf');
     }
 
     public function guru()
@@ -381,7 +407,7 @@ class JadwalController extends Controller
 
     function numberToAlphabet($number)
     {
-        $alphabet = range('a', 'z');
+        $alphabet = range('A', 'Z');
         $index = ($number - 1) % 26;
         return $alphabet[$index];
     }
@@ -389,7 +415,7 @@ class JadwalController extends Controller
     function addStaticData(string $result): array
     {
         $data = json_decode($result, true);
-    
+
         $newElementMonday = [
             "jamAjar" => "07:00-08:00",
             "guru" => "New Guru",
@@ -397,7 +423,7 @@ class JadwalController extends Controller
             "kelompok" => "New Kelompok",
             "code" => "Apel Pagi & Upacara Bendera"
         ];
-    
+
         $newElementOtherDays = [
             "jamAjar" => "07:00-07:15",
             "guru" => "New Guru",
@@ -405,7 +431,7 @@ class JadwalController extends Controller
             "kelompok" => "New Kelompok",
             "code" => "Apel Pagi"
         ];
-    
+
         $newElementFriday = [
             "jamAjar" => "07:00-07:20",
             "guru" => "New Guru",
@@ -413,7 +439,7 @@ class JadwalController extends Controller
             "kelompok" => "New Kelompok",
             "code" => "Apel Pagi dan Kultum"
         ];
-    
+
         $newElementBreakMonday = [
             "jamAjar" => "11:00-11:15",
             "guru" => "New Guru 2",
@@ -421,7 +447,7 @@ class JadwalController extends Controller
             "kelompok" => "New Kelompok 2",
             "code" => "Istirahat"
         ];
-    
+
         $newElementBreak = [
             "jamAjar" => "10:15-10:30",
             "guru" => "New Guru 2",
@@ -429,7 +455,7 @@ class JadwalController extends Controller
             "kelompok" => "New Kelompok 2",
             "code" => "Istirahat"
         ];
-    
+
         $newElementBreakFriday = [
             "jamAjar" => "08:50-09:10",
             "guru" => "New Guru 2",
@@ -437,7 +463,7 @@ class JadwalController extends Controller
             "kelompok" => "New Kelompok 2",
             "code" => "Istirahat"
         ];
-    
+
         foreach ($data as &$kelas) {
             foreach ($kelas as $dayName => &$hari) {
                 // Menghapus data jam pada hari Sabtu untuk waktu tertentu
@@ -480,7 +506,7 @@ class JadwalController extends Controller
                 } else {
                     array_unshift($hari, $newElementOtherDays);
                 }
-    
+
                 // Menambahkan elemen istirahat untuk setiap hari
                 if ($dayName === 'Senin') {
                     array_splice($hari, 5, 0, [$newElementBreakMonday]);
@@ -494,5 +520,4 @@ class JadwalController extends Controller
         // dd($data);
         return $data;
     }
-    
 }
