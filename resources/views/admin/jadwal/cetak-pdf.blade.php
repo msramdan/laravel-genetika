@@ -92,6 +92,35 @@
             border: 1px solid #ddd;
         }
 
+        .signature {
+            margin-top: 30px;
+            width: 100%;
+            text-align: right;
+        }
+
+        .signature-image {
+            margin-top: 5px;
+            height: 40px;
+            text-align: right;
+        }
+
+        .signature-image img {
+            height: 40px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .signature-name {
+            text-decoration: underline;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .signature-nip {
+            font-size: 8px;
+        }
+
+
         @media print {
             .page-break {
                 page-break-before: always;
@@ -301,6 +330,18 @@
         </tr>
     </table>
 
-</body>
+    <div class="signature">
+        <div>Halmahera Selatan, {{ date('d') }} {{ \Carbon\Carbon::now()->locale('id')->monthName }}
+            {{ date('Y') }}</div>
+        <div>Kepala Sekolah,</div>
 
+        <div class="signature-image">
+            <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('ttd.png'))) }}"
+                alt="Tanda Tangan">
+        </div>
+
+        <div class="signature-name">Aludin Hi. Sabtu, S.Pd</div>
+        <div class="signature-nip">NIP. 19770727 200604 1 029</div>
+    </div>
+</body>
 </html>
