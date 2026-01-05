@@ -75,6 +75,22 @@
                         <tbody>
                             @php
                                 $prevNamaHari = '';
+                                // Mapping code ke kode_warna - ambil karakter terakhir (huruf) sebagai kode mapel
+                                $colorMap = [];
+                                foreach ($mapels as $mapel) {
+                                    if (isset($mapel['code']) && isset($mapel['kode_warna']) && $mapel['kode_warna']) {
+                                        // Ambil huruf terakhir dari code (misal: "32U" -> "U")
+                                        $mapelCode = trim($mapel['code']);
+                                        if (!empty($mapelCode)) {
+                                            $lastChar = substr($mapelCode, -1);
+                                            $colorMap[$lastChar] = $mapel['kode_warna'];
+                                        }
+                                    }
+                                }
+
+                                // Debug: lihat mapping yang dibuat
+                                // echo '<pre>'; print_r($colorMap); echo '</pre>';
+
                             @endphp
 
                             @foreach ($haris as $hari)
@@ -89,42 +105,55 @@
                                         @if ($rowspan > 0)
                                             <td rowspan="10">{{ $namaHariIndex }}</td>
                                             <td rowspan="10">{{ $hari['nama_hari'] }}</td>
-
-                                            @php
-                                                $rowspan = 0;
-                                            @endphp
+                                            @php $rowspan = 0; @endphp
                                         @endif
 
                                         @foreach ($result as $key => $value)
+                                            @php
+                                                $cellData = $result[$key][$hari['nama_hari']][$i] ?? null;
+                                                $code = $cellData['code'] ?? '';
+                                                $jamAjar = $cellData['jamAjar'] ?? '';
+                                            @endphp
+
                                             @if ($loop->first)
-                                                @if (isset($result[$key][$hari['nama_hari']][$i]['jamAjar']))
-                                                    <td>{{ $result[$key][$hari['nama_hari']][$i]['jamAjar'] }}</td>
-                                                @else
-                                                    <td>-</td> <!-- Atur nilai default jika data tidak tersedia -->
-                                                @endif
+                                                <td>{{ $jamAjar ?: '-' }}</td>
                                             @endif
 
-                                            @if (isset($result[$key][$hari['nama_hari']][$i]['code']) &&
-                                                    ($result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi' ||
-                                                        $result[$key][$hari['nama_hari']][$i]['code'] == 'Istirahat' ||
-                                                        $result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi dan Kultum' ||
-                                                        $result[$key][$hari['nama_hari']][$i]['code'] == 'Apel Pagi & Upacara Bendera'))
-                                                @if ($loop->first)
-                                                    <td style="text-align: center;background:cyan;color:white"
-                                                        colspan="{{ count($result) }}">
-                                                        {{ $result[$key][$hari['nama_hari']][$i]['code'] }}
-                                                    </td>
-                                                @endif
-                                            @else
-                                                <td>{{ $result[$key][$hari['nama_hari']][$i]['code'] ?? '-' }}</td>
-                                                <!-- Nilai default jika data tidak tersedia -->
+                                            @php
+                                                $specialCodes = [
+                                                    'Apel Pagi',
+                                                    'Istirahat',
+                                                    'Apel Pagi dan Kultum',
+                                                    'Apel Pagi & Upacara Bendera',
+                                                ];
+                                                $isSpecialCode = in_array($code, $specialCodes);
+
+                                                // Untuk kode seperti "32U", ambil huruf terakhir
+                                                $backgroundColor = '';
+                                                if (!empty($code) && !$isSpecialCode && $code !== '====') {
+                                                    $lastChar = substr($code, -1);
+                                                    $backgroundColor = $colorMap[$lastChar] ?? '';
+                                                }
+                                            @endphp
+
+                                            @if ($isSpecialCode && $loop->first)
+                                                <td style="text-align: center; background: cyan; color: white"
+                                                    colspan="{{ count($result) }}">
+                                                    {{ $code }}
+                                                </td>
+                                                @break
+
+                                            @elseif (!$isSpecialCode)
+                                                <td
+                                                    style="@if ($backgroundColor) background-color: {{ $backgroundColor }}; color: white; @endif font-weight: bold; text-align: center; vertical-align: middle;">
+                                                    {{ $code ?: '-' }}
+                                                </td>
                                             @endif
                                         @endforeach
                                     </tr>
                                 @endfor
                             @endforeach
                         </tbody>
-
                     </table>
 
                 </div>
