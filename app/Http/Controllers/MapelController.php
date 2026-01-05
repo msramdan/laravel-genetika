@@ -47,7 +47,8 @@ class MapelController extends Controller
             'paket_id' => 'required',
             'kelompok' => 'required',
             'hour_weekly' => 'required',
-            'max_session' => 'required'
+            'max_session' => 'required',
+            'kode_warna' => 'required'
         ]);
 
         Mapel::updateOrCreate(
@@ -60,6 +61,7 @@ class MapelController extends Controller
                 'kelompok' => $request->kelompok,
                 'hour_weekly' => $request->hour_weekly,
                 'max_session' => $request->max_session,
+                'kode_warna' => $request->kode_warna,
             ]
         );
 

@@ -24,6 +24,7 @@
                     <th>Kelompok</th>
                     <th>Hour Weekly</th>
                     <th>Max Session</th>
+                    <th>Kode Warna</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -40,6 +41,12 @@
                     <td>{{ $data->kelompok }}</td>
                     <td>{{ $data->hour_weekly }}</td>
                     <td>{{ $data->max_session }}</td>
+                    <td>
+                      <div style="display: flex; align-items: center;">
+                        <div style="width: 20px; height: 20px; background-color: {{ $data->kode_warna }}; border: 1px solid #ccc; margin-right: 8px;"></div>
+                        {{ $data->kode_warna }}
+                      </div>
+                    </td>
                     <td>
                         <form action="{{ route('mapel.destroy', $data->id) }}" method="post">
                             @csrf
@@ -106,6 +113,17 @@
                   <label for="max_session">Max Session</label>
                   <input type="number" id="max_session" name="max_session" class="form-control @error('max_session') is-invalid @enderror" placeholder="{{ __('Max Session') }}">
                 </div>
+                
+                <div class="form-group">
+                  <label for="kode_warna">Kode Warna</label>
+                  <div class="input-group">
+                      <input type="text" id="kode_warna" name="kode_warna" class="form-control @error('kode_warna') is-invalid @enderror" placeholder="{{ __('Contoh: #FF5733') }}" value="#3c8dbc">
+                      <div class="input-group-append">
+                          <input type="color" id="color_picker" class="form-control" style="height: 38px; width: 50px; padding: 0; border: none;" value="#3c8dbc">
+                      </div>
+                  </div>
+                  <small class="text-muted">Pilih warna atau ketik kode HEX (#FF5733)</small>
+                </div>
               </div>
             </div>
         </div>
@@ -123,5 +141,30 @@
     $("#MasterData").addClass("active");
     $("#liMasterData").addClass("menu-open");
     $("#DataMapel").addClass("active");
+    
+    // Fungsi untuk color picker
+    document.addEventListener('DOMContentLoaded', function() {
+        const colorPicker = document.getElementById('color_picker');
+        const kodeWarnaInput = document.getElementById('kode_warna');
+        
+        // Saat color picker berubah, update input text
+        colorPicker.addEventListener('input', function() {
+            kodeWarnaInput.value = this.value;
+        });
+        
+        // Saat input text berubah, update color picker jika valid HEX
+        kodeWarnaInput.addEventListener('input', function() {
+            const colorValue = this.value;
+            // Validasi format HEX
+            if (/^#[0-9A-F]{6}$/i.test(colorValue)) {
+                colorPicker.value = colorValue;
+            }
+        });
+        
+        // Inisialisasi warna saat modal dibuka
+        $('.tambah-mapel').on('shown.bs.modal', function () {
+            colorPicker.value = kodeWarnaInput.value;
+        });
+    });
   </script>
 @endsection

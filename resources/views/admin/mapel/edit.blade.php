@@ -71,6 +71,17 @@
                   <label for="max_session">Max Session</label>
                   <input type="number" id="max_session" name="max_session" value="{{ $mapel->max_session }}" class="form-control @error('max_session') is-invalid @enderror" placeholder="{{ __('Max Session') }}">
                 </div>
+                
+                <div class="form-group">
+                  <label for="kode_warna">Kode Warna</label>
+                  <div class="input-group">
+                      <input type="text" id="kode_warna" name="kode_warna" value="{{ $mapel->kode_warna }}" class="form-control @error('kode_warna') is-invalid @enderror" placeholder="{{ __('Contoh: #FF5733') }}">
+                      <div class="input-group-append">
+                          <input type="color" id="color_picker" class="form-control" style="height: 38px; width: 50px; padding: 0; border: none;" value="{{ $mapel->kode_warna ? $mapel->kode_warna : '#3c8dbc' }}">
+                      </div>
+                  </div>
+                  <small class="text-muted">Pilih warna atau ketik kode HEX (#FF5733)</small>
+                </div>
             </div>
           </div>
         </div>
@@ -89,9 +100,28 @@
 <script type="text/javascript">
     $(document).ready(function() {
         $('#back').click(function() {
-        window.location="{{ route('mapel.index') }}";
+            window.location="{{ route('mapel.index') }}";
+        });
+        
+        // Fungsi untuk color picker
+        const colorPicker = document.getElementById('color_picker');
+        const kodeWarnaInput = document.getElementById('kode_warna');
+        
+        // Saat color picker berubah, update input text
+        colorPicker.addEventListener('input', function() {
+            kodeWarnaInput.value = this.value;
+        });
+        
+        // Saat input text berubah, update color picker jika valid HEX
+        kodeWarnaInput.addEventListener('input', function() {
+            const colorValue = this.value;
+            // Validasi format HEX
+            if (/^#[0-9A-F]{6}$/i.test(colorValue)) {
+                colorPicker.value = colorValue;
+            }
         });
     });
+    
     $("#MasterData").addClass("active");
     $("#liMasterData").addClass("menu-open");
     $("#DataMapel").addClass("active");
