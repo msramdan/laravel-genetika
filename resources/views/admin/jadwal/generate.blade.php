@@ -40,7 +40,7 @@
                                 <tr>
                                     <th>No.</th>
                                     <th>Nama Mapel</th>
-                                    <th>Kode</th>
+                                    <th>Kode Warna</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -48,7 +48,10 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $mapel['nama_mapel'] }}</td>
-                                        <td>{{ $mapel['code'] }}</td>
+                                        <td
+                                            @if (!empty($mapel['kode_warna'])) style="background-color: {{ $mapel['kode_warna'] }}; color: white; font-weight: bold;" @endif>
+                                            {{ $mapel['code'] ?? '-' }}
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
